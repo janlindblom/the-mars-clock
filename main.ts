@@ -91,8 +91,8 @@ let leap_year = true
 let year = 2020
 let month = 6
 let day = 8
-let hour = 15
-let minute = 58
+let hour = 16
+let minute = 36
 let feb_days = 28
 if (leap_year) {
     feb_days = 29
@@ -132,19 +132,19 @@ basic.forever(function () {
     makeWhaleyNumber(hour),
     0,
     1,
-    0
+    128
     )
     scrollbit.setImage(
     makeWhaleyNumber(minute),
     6,
     1,
-    0
+    128
     )
     scrollbit.setImage(
     makeWhaleyNumber(second),
     12,
     1,
-    0
+    128
     )
     scrollbit.show()
 })
