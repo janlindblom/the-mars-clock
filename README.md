@@ -1,14 +1,7 @@
 
 > Open this page at [https://janlindblom.github.io/the-mars-clock/](https://janlindblom.github.io/the-mars-clock/)
 
-## Use as Extension
-
-This repository can be added as an **extension** in MakeCode.
-
-* open [https://makecode.microbit.org/](https://makecode.microbit.org/)
-* click on **New Project**
-* click on **Extensions** under the gearwheel menu
-* search for **https://github.com/janlindblom/the-mars-clock** and import
+This incorporates the math from [James Taubers' Mars Clock](https://jtauber.github.io/mars-clock/), check it out!
 
 ## Edit this project ![Build status badge](https://github.com/janlindblom/the-mars-clock/workflows/MakeCode/badge.svg)
 
