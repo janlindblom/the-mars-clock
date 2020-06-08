@@ -78,25 +78,34 @@ function findJDN (y: number, m: number, d: number) {
     part3 = 3 * Math.idiv(Math.idiv(y + 4900 + Math.idiv(m - 14, 12), 100), 4)
     return part1 + part2 - part3 + d - 32075
 }
-function h_to_hms (h: number) {
+
+function h_to_hms(h: number) {
     x = h * 3600
     hh = Math.floor(x / 3600)
+    y = x % 3600
+    mm = Math.floor(y / 60)
+    ss = Math.round(y % 60)
+    return [hh,mm,ss]
+}
+
+function h_to_hmss (h: number) {
+    let hms = h_to_hms(h)
+    hh = hms[0]
+    mm = hms[1]
+    ss = hms[2]
     hs = "" + hh
     if (hh < 10) {
         hs = "0" + hh
     }
-    y = x % 3600
-    mm = Math.floor(y / 60)
     ms = "" + mm
     if (mm < 10) {
         ms = "0" + mm
     }
-    ss = Math.round(y % 60)
     sss = "" + ss
     if (ss < 10) {
         sss = "0" + ss
     }
-    return "" + hs + ":" + ms + ":" + sss
+    return [hs, ms, sss]
 }
 let jd = 0
 let jdn = 0
@@ -121,7 +130,7 @@ let clearimg = images.createImage(`
     . . . . .
     `)
 let whaleyfont = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1], [1, 1, 0, 1, 1, 1, 1, 0, 1, 1], [1, 1, 0, 1, 1, 1, 0, 1, 1, 1], [1, 0, 1, 0, 1, 1, 0, 1, 0, 1], [1, 1, 1, 0, 1, 1, 0, 1, 1, 1], [1, 1, 1, 0, 1, 1, 1, 1, 1, 1], [1, 1, 0, 1, 0, 1, 0, 1, 0, 1], [1, 1, 1, 1, 0, 0, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 0, 1, 1, 1]]
-let tai_offset = 0
+let tai_offset = 37
 let setup_complete = false
 let whaleyimg = images.createImage(`
     . . . . .
@@ -130,16 +139,16 @@ let whaleyimg = images.createImage(`
     . . . . .
     . . . . .
     `)
-tai_offset = 37
-
+let mtc = 0
 serial.redirectToUSB()
 let leap_year = true
 let year = 2020
 let month = 6
 let day = 8
-let hour = 16
+let hour = 15
 let minute = 36
 let feb_days = 28
+let l_s = 0
 if (leap_year) {
     feb_days = 29
 }
@@ -147,6 +156,8 @@ let mdays = [0, 31, feb_days, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 scrollbit.clear()
 // Earth time display loop
 basic.forever(function () {
+    jdn = findJDN(year, month, day)
+    jd = findJD(jdn, hour, minute, second)
     // Pause for a regular Earth second
     basic.pause(1000)
     second += 1
@@ -170,32 +181,44 @@ basic.forever(function () {
         month = 1
         year += 1
     }
-    jdn = findJDN(year, month, day)
-    jd = findJD(jdn, hour, minute, second)
-    serial.writeValue("earth", 0)
+    serial.writeValue("earth", jd)
+})
+
+// Mars time display loop
+basic.forever(function () {
+    // Mars seconds are 2.7% longer than Earth seconds so we pause accordingly
+    basic.pause(1027)
+    let jd_tt = calculate_jd_tt(jd)
+    let j2000 = calculate_j2000(jd_tt)
+    let m = calculate_m(j2000)
+    let alpha_fms = calculate_alpha_fms(j2000)
+    let e = calculate_e(j2000)
+    let pbs = calculate_pbs(j2000)
+    let nu_m = calculate_nu_m(j2000, m, pbs)
+    let nu = calculate_nu(nu_m, m)
+    l_s = calculate_l_s(alpha_fms, nu_m)
+    let msd = calculate_msd(j2000)
+    mtc = calculate_mtc(msd)
+    let hms = h_to_hms(mtc)
     scrollbit.clear()
     scrollbit.setImage(
-    makeWhaleyNumber(hour),
+    makeWhaleyNumber(hms[0]),
     0,
     1,
     128
     )
     scrollbit.setImage(
-    makeWhaleyNumber(minute),
+    makeWhaleyNumber(hms[1]),
     6,
     1,
     128
     )
     scrollbit.setImage(
-    makeWhaleyNumber(second),
+    makeWhaleyNumber(hms[2]),
     12,
     1,
     128
     )
     scrollbit.show()
-})
-// Mars time display loop
-basic.forever(function () {
-    // Mars seconds are 2.7% longer than Earth seconds so we pause accordingly
-    basic.pause(1027)
+    serial.writeValue("mars", msd)
 })
