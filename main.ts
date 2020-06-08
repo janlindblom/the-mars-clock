@@ -5,6 +5,8 @@ function findJD (jdn: number, h: number, m: number, s: number) {
     part3 = s / 86400
     return jdn + part1 + part2 + part3
 }
+// This bit comes from the WhaleySansFont extension:
+// https://github.com/makecode-extensions/WhaleySansFont/blob/master/WhaleySansFont.ts
 function makeWhaleyNumber (dat: number) {
     whaleyimg = clearimg
     if (dat < 0) {
@@ -14,9 +16,9 @@ function makeWhaleyNumber (dat: number) {
     b = whaleyfont[dat % 10]
     for (let i = 0; i <= 4; i++) {
         whaleyimg.setPixel(0, i, 1 == a[i * 2])
-whaleyimg.setPixel(1, i, 1 == a[i * 2 + 1])
-whaleyimg.setPixel(3, i, 1 == b[i * 2])
-whaleyimg.setPixel(4, i, 1 == b[i * 2 + 1])
+        whaleyimg.setPixel(1, i, 1 == a[i * 2 + 1])
+        whaleyimg.setPixel(3, i, 1 == b[i * 2])
+        whaleyimg.setPixel(4, i, 1 == b[i * 2 + 1])
     }
     return whaleyimg
 }
@@ -124,8 +126,7 @@ basic.forever(function () {
     }
     jdn = findJDN(year, month, day)
     jd = findJD(jdn, hour, minute, second)
-    serial.writeValue("earth", 0)
-    serial.writeString("" + hour + ":" + minute + ":" + second)
+    serial.writeValue("earth", jd)
     scrollbit.clear()
     scrollbit.setImage(
     makeWhaleyNumber(hour),
